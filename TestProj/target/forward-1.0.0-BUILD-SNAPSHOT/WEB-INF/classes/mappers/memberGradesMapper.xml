@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+<mapper namespace="com.lecto.forward.persistence.MemberGradesMapper">
+	<resultMap type="com.lecto.forward.dto.MemberGradesDTO" id="memberGrades">
+		<id property="boardMemberGrade" column="board_member_grade" jdbcType="VARCHAR"/>
+		<id property="boardCode" column="board_code" jdbcType="VARCHAR"/>
+		<id property="memberId" column="member_id" jdbcType="VARCHAR"/>
+		<id property="gradeNum" column="grade_num" jdbcType="INTEGER"/>
+	</resultMap>
+	
+	 <sql id="columns">
+	 	board_member_grade, board_code, member_id, grade_num
+	 </sql>
+	
+	<insert id="addMemberGradesDTO">
+		insert into member_grades_tb
+		values(#{boardMemberGrade}, #{boardCode}, #{memberId}, #{gradeNum})		
+	</insert>
+	
+	<insert id="addMemberGrades" parameterType="java.util.List">
+		insert into member_grades_tb
+		values
+		<foreach collection="list" item="item" separator=",">
+			(#{item.boardMemberGrade}, #{item.boardCode}, #{item.memberId}, #{item.gradeNum})
+		</foreach>
+	</insert>
+	
+	<update id="updateMemberGradesDTO">
+		update member_grades_tb set
+		board_code = #{boardCode},
+		member_id = #{memberId},
+		grade_num=#{gradeNum}
+		where
+		board_member_grade =#{boardMemberGrade}
+	</update>
+	
+	<update id="updateMemberGrades" parameterType="java.util.List">
+			<foreach collection="list" item="item" separator=";" index="index">
+			update member_grades_tb set
+				board_code =#{item.boardCode}, 
+				member_id =#{item.memberId},
+				grade_num =#{item.gradeNum}
+				where
+				board_member_grade = #{item.boardMemberGrade}
+			</foreach>
+	</update>
+		
+	<delete id="deleteMemberId">
+		delete from member_grades_tb
+		where
+		member_id =#{memberId}
+	</delete>
+	
+	<delete id="deleteBoardCode">
+		delete from member_grades_tb
+		where
+		board_code = #{boardCode}
+	</delete>
+	
+	<select id="searchMembarGradesAll" resultMap="memberGrades">
+		select <include refid="columns"/>
+		from member_grades_tb		
+	</select>
+	
+	<select id="searchToBoardCode" parameterType="string" resultMap="memberGrades">
+		select <include refid="columns" />
+		from member_grades_tb
+		where
+		board_code = #{boardCode}
+	</select>
+	
+	<select id="searchToMemberId" parameterType="string" resultMap="memberGrades">
+		select <include refid="columns" />
+		from member_grades_tb
+		where
+		member_id = #{memberId}
+	</select>
+	
+	<select id="searchBoardGrades" resultMap="memberGrades">
+		select <include refid="columns" />
+		from member_grades_tb
+		where
+		board_code = #{boardCode} 
+		and
+		member_id = #{memberId}
+	</select>
+	
+	<select id="searchMemberIdGrades" resultMap="memberGrades">
+		select <include refid="columns" /> 
+		from member_grades_tb
+		where
+		board_code = #{boardCode}
+		and
+		grade_num = #{gradeNum}
+	</select>
+	
+	<select id="searchBoardMemberGrades" parameterType="string" resultMap="memberGrades">
+		select <include refid="columns" />
+		from member_grades_tb
+		where
+		board_member_grade =#{boardMemberGrade}
+	</select>	
+
+</mapper>

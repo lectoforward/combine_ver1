@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.lecto.forward.persistence.GradeMapper">
+	<resultMap type="com.lecto.forward.dto.GradeDTO" id="grade">
+		<id property="gradeNum" column="grade_num" jdbcType="INTEGER"/>
+		<id property="gradeName" column="grade_name" jdbcType="VARCHAR"/>
+		<id property="articleCount" column="article_count" jdbcType="INTEGER"/>
+		<id property="boardCode" column="board_code" jdbcType="VARCHAR"/>
+	</resultMap>
+	
+	<sql id="columns">
+		grade_num, grade_name, article_count, board_code
+	</sql>
+	
+	<!-- dto받아 등급 정보 추가 -->
+	<insert id="addGradeParam">
+		insert into grade_tb (<include refid="columns"></include>)
+		values(#{gradeNum},#{gradeName},#{articleCount},#{boardCode})	
+	</insert>
+	
+
+	<!-- dto여러개 받아서 하나의 게시판의 모든 등급 객체 추가 -->
+	<!-- gradeNum과 boardCode로 등급 정보를 찾아 삭제 후 새로운 등급 기준과 등급명 추가할때 추가 기능에도 사용 -->
+	<!-- gradeDTO여러개 받아서 update -->
+	<insert id="addGradeParams" parameterType="java.util.ArrayList">
+		insert into grade_tb 
+		values
+		<foreach collection="list" item="item" index="index" separator=" , ">
+			(#{item.gradeNum},#{item.gradeName},#{item.articleCount},#{item.boardCode})
+		</foreach>	
+	</insert>
+	
+	<!-- gradeNum과 boardCode로 등급 정보를 찾아 등급 기준 변경-->
+	<update id="updateArticleCount" parameterType="java.util.Map">
+		update grade_tb set article_count=#{newArticleCount} where grade_num=#{gradeNum} and board_code=#{boardCode}
+	</update>
+	
+	<!-- gradeNum과 boardCode로 등급 정보를 찾아 등급 이름 변경-->
+	<update id="updateGradeName" parameterType="java.util.Map">
+		update grade_tb set grade_name=#{newGradeName} where grade_num=#{gradeNum} and board_code=#{boardCode}
+	</update>
+	
+	<!-- dto의 정보와 일치하는 등급 정보의 등급 이름과 등급기준 변경 -->
+	<update id="updateGrade" parameterType="com.lecto.forward.dto.GradeDTO">
+		update grade_tb set grade_name=#{gradeName}, article_count=#{articleCount} where grade_num=#{gradeNum} and board_code=#{boardCode}
+	</update>
+	
+	<!-- boardCode로 등급 정보 삭제하기 -->
+	<delete id="deleteBoardParam" parameterType="string">
+		delete from grade_tb where board_code=#{boardCode}
+	</delete>
+	
+	<!-- boardCode와 gradeNum이 일치하는 등급 정보 삭제 -->
+	<delete id="deleteGradeParams" parameterType="java.util.Map">
+		DELETE FROM grade_tb WHERE board_code=#{boardCode} AND grade_num=#{gradeNum}
+	</delete>
+	
+	<!-- GradeDTO와 일치하는 등급 정보 삭제 -->
+	<delete id="deleteGradeParam" parameterType="com.lecto.forward.dto.GradeDTO">
+		DELETE FROM grade_tb WHERE board_code=#{boardCode} AND grade_num=#{gradeNum}
+	</delete>
+	
+	<!-- GradeDTO와 일치하는 등급 정보 찾기 -->
+	<delete id="deleteGradeDtoArray" parameterType="java.util.List">
+		DELETE FROM grade_tb
+		WHERE
+		<foreach collection="list" item="item" index="index" separator="or">
+			grade_num=#{item.gradeNum}
+		</foreach>
+	</delete>
+	
+	<!-- boardCode와 gradeName이 같은 등급 정보 찾기 -->
+	<select id="searchUseNameAndCode"  resultMap="grade">
+		select <include refid='columns'/> 
+		from grade_tb
+		where grade_name=#{gradeName} and board_code=#{boardCode}
+	</select>
+	
+	<!-- boardCode에 해당하는 등급 찾기 -->
+	<select id="searchUseCode" resultMap="grade">
+		select * from grade_tb
+		where board_code=#{boardCode}
+	</select>
+	
+	<!-- dto로 같은 dto찾기? -->
+	<select id="searchUseDto" resultMap="grade">
+		select * from grade_tb
+		where grade_num=#{gradeNum} and board_code=#{boardCode}
+	</select>
+
+	
+	<select id="searchGradeDtos" parameterType="java.util.Map" resultType="java.util.HashMap">
+		select * from grade_tb
+		where
+		<foreach collection="list" item="item" index="index" separator=" || ">
+			grade_num=#{item.gradeNum} and board_code=#{item.boardCode}
+		</foreach>
+	</select>
+</mapper>

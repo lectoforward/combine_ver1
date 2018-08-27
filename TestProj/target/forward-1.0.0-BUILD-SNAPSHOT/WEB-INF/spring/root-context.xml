@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.1.xsd">
+	
+	<!-- Root Context: defines shared resources visible to all other web components -->
+	<bean id="dataSource" 
+	      class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+		<property name="driverClassName" value="net.sf.log4jdbc.sql.jdbcapi.DriverSpy"></property>
+		<property name="url" value="jdbc:log4jdbc:mysql://127.0.0.1:3306/forward"></property><!--  -->
+		<property name="username" value="root"></property>
+		<property name="password" value="1234"></property>
+	</bean>	
+	
+	<bean id="sessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+	 	<property name="dataSource" ref="dataSource" />
+		<!-- <property name="configLocation" value="classpath:/mybatis-config.xml"></property> -->
+		<property name="mapperLocations" value="classpath:mappers/**/*Mapper.xml"></property>			
+	</bean>
+
+	<bean id="memberMapper" class="org.mybatis.spring.mapper.MapperFactoryBean">
+		<property name="mapperInterface" value="com.lecto.forward.persistence.MemberMapper" />
+		<property name="sqlSessionFactory" ref="sessionFactory"></property>
+	</bean>
+	
+	<bean id="memberArticleViewMapper" class="org.mybatis.spring.mapper.MapperFactoryBean">
+		<property name="mapperInterface" value="com.lecto.forward.persistence.MemberArticleViewMapper" />
+		<property name="sqlSessionFactory" ref="sessionFactory"></property>
+	</bean>
+	
+	<bean id="managerViewMapper" class="org.mybatis.spring.mapper.MapperFactoryBean">
+		<property name="mapperInterface" value="com.lecto.forward.persistence.ManagerViewMapper" />
+		<property name="sqlSessionFactory" ref="sessionFactory"></property>
+	</bean>
+	
+	<bean id="boardSearchViewMapper" class="org.mybatis.spring.mapper.MapperFactoryBean">
+		<property name="mapperInterface" value="com.lecto.forward.persistence.BoardSearchViewMapper" />
+		<property name="sqlSessionFactory" ref="sessionFactory"></property>
+	</bean>
+	
+	<bean id="boardMemberListViewMapper" class="org.mybatis.spring.mapper.MapperFactoryBean">
+		<property name="mapperInterface" value="com.lecto.forward.persistence.BoardMemberListViewMapper" />
+		<property name="sqlSessionFactory" ref="sessionFactory"></property>
+	</bean>
+	
+	<bean id="articleViewMapper" class="org.mybatis.spring.mapper.MapperFactoryBean">
+		<property name="mapperInterface" value="com.lecto.forward.persistence.ArticleViewMapper" />
+		<property name="sqlSessionFactory" ref="sessionFactory"></property>
+	</bean>
+	
+	<bean id="memberGradesMapper" class="org.mybatis.spring.mapper.MapperFactoryBean">
+		<property name="mapperInterface" value="com.lecto.forward.persistence.MemberGradesMapper" />
+		<property name="sqlSessionFactory" ref="sessionFactory"></property>
+	</bean>
+	
+	<bean id="boardMapper" class="org.mybatis.spring.mapper.MapperFactoryBean">
+		<property name="mapperInterface" value="com.lecto.forward.persistence.BoardMapper" />
+		<property name="sqlSessionFactory" ref="sessionFactory"></property>
+	</bean>
+	
+	<bean id="gradeMapper" class="org.mybatis.spring.mapper.MapperFactoryBean">
+		<property name="mapperInterface" value="com.lecto.forward.persistence.GradeMapper" />
+		<property name="sqlSessionFactory" ref="sessionFactory"></property>
+	</bean>
+	
+	<bean id="themeMapper" class="org.mybatis.spring.mapper.MapperFactoryBean">
+		<property name="mapperInterface" value="com.lecto.forward.persistence.ThemeMapper" />
+		<property name="sqlSessionFactory" ref="sessionFactory"></property>
+	</bean>
+	
+	<bean id="articleMapper" class="org.mybatis.spring.mapper.MapperFactoryBean">
+		<property name="mapperInterface" value="com.lecto.forward.persistence.ArticleMapper" />
+		<property name="sqlSessionFactory" ref="sessionFactory"></property>
+	</bean>
+	<context:component-scan base-package="com.lecto.forward"/>	
+</beans>

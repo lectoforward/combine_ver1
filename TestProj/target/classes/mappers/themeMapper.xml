@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.lecto.forward.persistence.ThemeMapper">
+
+	<resultMap type="com.lecto.forward.dto.ThemeDTO" id="theme">
+		<id property="themeCode" column="theme_code" jdbcType="VARCHAR"/>
+		<id property="themeName" column="theme_name" jdbcType="VARCHAR"/>
+		<id property="themePath" column="theme_path" jdbcType="VARCHAR"/>
+		<id property="imagePath" column="image_path" jdbcType="VARCHAR"/>	
+
+	</resultMap>
+	
+	<insert id="addTheme">
+		insert into theme_tb(theme_code, theme_name,theme_path,image_path)
+		values(#{themeCode},#{themeName},#{imagePath},#{themePath})
+	</insert>
+	
+	
+	<insert id="addThemeParam">
+		insert into theme_tb(theme_code, theme_name, theme_path, image_path)
+		values(#{themeCode},#{themeName},#{imagePath},#{themePath})
+	
+	</insert>
+	
+	
+	<insert id="addThemeParams" parameterType="java.util.List">
+		
+		insert into theme_tb(theme_code, theme_name, theme_path, image_path)
+		values
+		<foreach collection="list" item="item" separator=",">
+			("${item.themeCode}","${item.themeName}","${item.themePath}","${item.imagePath}")
+		</foreach>
+	
+	
+	</insert>
+	
+	
+	<delete id="deleteThemeParam">
+		delete from theme_tb
+		where theme_code='${themeCode}'
+	
+	</delete>
+	
+	
+	
+	<delete id="deleteThemeParams" parameterType="java.util.List">
+		delete from theme_tb
+		where theme_code IN
+		<foreach collection="list" item="item" open="(" close=")" separator=",">
+			#{item.themeCode}
+		</foreach>	
+
+	</delete>
+
+
+</mapper>

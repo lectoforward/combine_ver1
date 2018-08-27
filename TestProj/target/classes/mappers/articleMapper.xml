@@ -1,0 +1,203 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.lecto.forward.persistence.ArticleMapper">
+
+	<resultMap type="com.lecto.forward.dto.ArticleDTO" id="article">
+		<id property="articleHits" column="article_hits" jdbcType="INTEGER"/>
+		<id property="articleTitle" column="article_title" jdbcType="VARCHAR"/>
+		<id property="articleContent" column="article_content" jdbcType="VARCHAR"/>
+		<id property="articleCode" column="article_code" jdbcType="VARCHAR"/>
+		<id property="notice" column="notice" jdbcType="BOOLEAN"/>	
+		<id property="articleDate" column="article_date" jdbcType="DATE"/>
+		<id property="boardCode" column="board_code" jdbcType="VARCHAR"/>
+		<id property="memberId" column="member_id" jdbcType="VARCHAR"/>
+	</resultMap>
+
+
+	<sql id="columns">
+		article_hits, article_title, article_content, article_code,
+		notice,article_date, board_code, member_id
+	</sql>
+
+	<insert id="addArticle">
+		insert into article_tb(article_hits, article_title, article_content, article_code,
+		notice, board_code, article_date, member_id)
+		values(#{articleHits},#{articleTitle},#{articleContent},#{articleCode},
+		#{notice},#{boardCode},now(),#{memberId})
+	</insert>
+
+
+	<update id="updateArticleParams">
+		update article_tb set 
+		article_hits=#{articleHits}
+		,article_title=#{articleTitle} 
+		,article_content=#{articleContent}
+		,article_date=#{articleDate}
+		,member_id=#{memberId}
+		where article_code=#{articleCode}
+	</update>
+
+
+
+	<update id="updateArticleParam">
+		update article_tb set 
+		article_hits=#{articleHits}
+		,article_title=#{articleTitle}
+		,article_content=#{articleContent}
+		,notice=#{notice}
+		,article_date=#{articleDate}
+		,board_code=#{boardCode}
+		,member_id=#{memberId}
+		where article_code=#{articleCode}		
+	</update>
+
+
+	<update id="updateTitle">
+		update article_tb set article_date=#{articleDate},
+		article_title=#{articleTitle}
+		where article_code=#{articleCode}
+		
+	</update>
+
+
+	<update id="updateContent">
+		update article_tb set article_content=#{newContent},
+		article_date=#{articleDate}
+		where article_code=#{articleCode}
+	</update>
+
+	<update id="updateHits">
+		update article_tb set article_hits=#{articleHits}
+		where article_code=#{articleCode}
+	</update>
+
+	<update id="updateArticleHits">
+		update article_tb set article_hits=article_hits+1
+		where article_code=#{articleCode}
+	</update>
+
+	<update id="updateNotice">
+		update article_tb set notice=#{notice}, article_date=#{articleDate}
+		where article_code=#{articleCode}
+	</update>
+
+
+
+	<update id="updateDate">
+		update article_tb set article_date=#{articleDate}
+		where article_code=#{articleCode}
+	</update>
+
+
+	<delete id="deleteArticleCode">
+		delete from article_tb
+		where article_code=#{articleCode}
+	</delete>
+	
+	
+	<delete id="deleteArticleMemberId">
+		delete from article_tb
+		where member_id=#{memberId}	
+	</delete>
+	
+	
+	<delete id="deleteArticleParam">
+		delete from article_tb
+		where article_code=#{articleCode}
+	</delete>
+		
+	
+	<delete id="deleteArticleParams" parameterType="java.util.List">
+		delete from article_tb
+		where article_code IN
+		<foreach collection="list" item="item" open="(" close=")" separator=",">
+		#{item.articleCode}
+		</foreach>
+		
+	</delete>
+	
+	<delete id="deleteArticleCodes" parameterType="java.util.List">
+		delete from article_tb
+		where article_code IN
+		<foreach collection="list" item="item" open="(" close=")" separator=",">
+		#{item}
+		</foreach>
+	</delete>
+	
+	<select id="searchTitle" resultMap="article">
+		select <include refid="columns"/>
+		from article_tb
+		where article_title=#{articleTitle}
+	</select>
+	
+	<select id="searchKeyword" resultMap="article">
+	
+		select <include refid="columns"/>
+		from article_tb
+		<choose>
+		<!-- 만약 searchMethod가 title 이면 일치하는 제목을 찾고 -->
+		<when test="searchMethod=='title'">
+			where article_title=#{keyword}
+		</when>
+		
+		<!--  만약 searchMethod가 content 이면 일칠하는 내용을 찾고 -->
+		<when test="searchMethod=='content'">
+			where article_content LIKE CONCAT('%',#{keyword},'%')
+		</when>
+			
+		
+		</choose>
+	</select>
+	
+	
+	<select id="searchDate" resultMap="article">
+		select <include refid="columns"/>
+		from article_tb
+		where article_date between #{startDate,jdbcType=DATE} and #{endDate,jdbcType=DATE}
+	</select>
+	
+	
+	<select id="searchId" resultMap="article">
+		select <include refid="columns"/>
+		from article_tb
+		where member_id='${memberId}'
+	</select>
+	
+	<select id="searchBoardCode" resultMap="article">
+		select <include refid="columns"/>
+		from article_tb
+		where board_code='${boardCode}'
+	</select>
+	
+	<select id="searchArticleCode" resultMap="article">
+		select <include refid="columns"/>
+		from article_tb
+		where article_code='${articleCode}'
+	</select>
+	
+	
+	<select id="searchArticleParam" resultMap="article">
+		select <include refid="columns"/>
+		from article_tb
+		where article_code='${articleCode}'
+	</select>
+	
+	
+	<select id="searchArt`icleParams" parameterType="java.util.List" resultMap="article">
+		<!-- 넘어와서 넘어온 aritlces에 있는 articleId를 뽑아내서 검색한 결과값을  -->
+	 	select <include refid="columns"/>
+	 	from article_tb
+	 	where article_code IN
+	 	<foreach collection="list" item="item" open="(" close=")" separator=",">
+	 		#{item.articleCode}
+	 	</foreach>
+	 	
+	</select>
+	
+	<select id="searchAllArticle" resultMap="article">
+		select <include refid="columns" />
+		from article_tb
+	</select>
+	
+	
+</mapper>

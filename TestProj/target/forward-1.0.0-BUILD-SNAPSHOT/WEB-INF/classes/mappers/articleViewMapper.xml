@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+  <mapper namespace="com.lecto.forward.persistence.ArticleViewMapper">
+	 <resultMap type="com.lecto.forward.vo.ArticleVO" id="articleVO">
+	 	<id property="boardCode" column="board_code" jdbcType="VARCHAR" />
+	 	<id property="memberNickname" column="member_nickname" jdbcType="VARCHAR" />
+	 	<id property="articleHits" column="article_hits" jdbcType="INTEGER" />
+	 	<id property="articleTitle" column="article_title" jdbcType="VARCHAR" />
+	 	<id property="articleContent" column="article_content" jdbcType="VARCHAR" />
+	 	<id property="articleCode" column="article_code" jdbcType="VARCHAR" />
+	 	<id property="articleDate" column="article_date" jdbcType="DATE" />
+	 	<id property="notice" column="notice" jdbcType="BOOLEAN" />
+	 	<id property="commentCnt" column="cmt_cnt" jdbcType="INTEGER" />
+	 </resultMap>
+
+	 <sql id="columns">
+	 	board_code, member_nickname, article_hits, article_title, article_content,
+	 	article_code, article_date, notice, cmt_cnt
+	 </sql>	
+	 
+	 <select id="searchArticle" resultMap="articleVO">
+	 	select <include refid="columns" />
+	 	from article_view
+	 	where board_code = #{boardCode} order by article_date asc
+	 </select>
+	 
+	 <!-- 데스트 해본다 -->
+	 <select id="searchArticleKeyword" parameterType="string" resultMap="articleVO">
+	 	select <include refid="columns" />
+	 	from article_view
+	 	where
+	 	<choose>
+	 		<when test="searchWayCode == 1">
+	 			member_nickname like CONCAT('%',#{keyword},'%')
+	 		</when>
+	 		<when test="searchWayCode == 2">
+	 			article_title like CONCAT('%',#{keyword},'%')
+	 		</when>
+	 		<when test="searchWayCode == 3">
+	 			article_content like CONCAT('%',#{keyword},'%')
+	 		</when>
+	 	</choose>
+
+	 	order by article_date asc
+	 </select>
+	 
+	 <select id="searchNotice" resultMap="articleVO">
+	 	select <include refid="columns" />
+	 	from article_view 
+	 	where notice = #{notice}
+	 	order by article_date asc
+	 </select>
+	 
+	 <select id="searchArticleView" resultMap="articleVO">
+	 	select <include refid="columns" />
+	 	from article_view
+	 	where article_code=#{articleCode}
+	 	and
+	 	notice = #{notice}
+	 	and
+	 	member_nickname=#{memberNickname}
+	 	and 
+	 	article_title=#{articleTitle}
+	 	and
+	 	article_content=#{articleContent}
+	 	and
+	 	article_date=#{articleDate}
+	 	and
+	 	board_code=#{boardCode}
+	 	order by article_date asc
+	 </select>
+	 
+	 <select id="searchArticleViews" resultMap="articleVO">
+	 	select <include refid="columns" />
+	 	from article_view
+	 	where
+	 	<foreach collection="list" item="item" separator="or" index="index" open="(" close=")">
+	 	article_code=#{item.articleCode}
+	 	and
+	 	notice = #{item.notice}
+	 	and
+	 	member_nickname=#{item.memberNickname}
+	 	and 
+	 	article_title=#{item.articleTitle}
+	 	and
+	 	article_content=#{item.articleContent}
+	 	and
+	 	article_date=#{item.articleDate}
+	 	and
+	 	board_code=#{item.boardCode}
+	 	</foreach>
+	 	order by article_date asc
+	 </select>
+	 
+	 <select id="searchArticleCode" resultMap="articleVO">
+	 	select <include refid="columns" />
+	 	from article_view
+	 	where article_code=#{articleCode}
+	 </select>
+	 	
+	 
+	<select id="searchArticleByDate" resultType="string"> <!-- 이거이거 2018-08-26 통계용 -->
+		select article_datefrom article_view 
+		<![CDATA[
+			where
+			board_code = #{boardCode}
+			and article_date >= SUBDATE(now(), INTERVAL 30 DAY)
+			and article_date <= date(now())
+		]]>order by article_date asc 
+	</select>
+	
+	
+	<select id="searchArticleByMonth" resultType="java.lang.Integer"><!-- 이거이거 2018-08-26 통계용 -->
+		select COALESCE(count(*), 0)from article_view 
+		<![CDATA[
+			where board_code = #{boardCode}
+			and article_date >= SUBDATE(#{criteriaDate}, INTERVAL 1 MONTH)
+			and article_date <= date(#{criteriaDate})
+		]]>
+	</select>
+</mapper>

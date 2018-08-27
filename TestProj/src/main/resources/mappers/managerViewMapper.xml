@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+  <mapper namespace="com.lecto.forward.persistence.ManagerViewMapper">
+	 <resultMap type="com.lecto.forward.vo.ManagerVO" id="managerVO">
+	 	<id property="memberId" column="member_id" jdbcType="VARCHAR" />
+	 	<id property="memberName" column="member_name" jdbcType="VARCHAR" />
+	 	<id property="memberPhone" column="member_phone" jdbcType="VARCHAR" />
+	 	<id property="boardName" column="board_name" jdbcType="VARCHAR" />
+	 	<id property="boardCode" column="board_code" jdbcType="VARCHAR" />
+	 </resultMap>
+	 
+	 <sql id="columns">
+	 	member_id, member_name, member_phone, board_name, board_code
+	 </sql>
+	 
+	 <select id="searchMemberId" resultMap="managerVO">
+	 	select <include refid="columns" />
+		from manager_view
+	 	where member_id = #{memberId}
+	 </select>
+	 
+	 <select id="searchMemberName" resultMap="managerVO">
+	 	select <include refid="columns" />
+		from manager_view
+	 	where member_name = #{memberName}
+	 </select>
+	 
+	 <select id="searchBoardName" resultMap="managerVO">
+	 	select <include refid="columns" />
+		from manager_view
+	 	where board_name = #{boardName}
+	 </select>
+	 
+	 <select id="searchManagerView" resultMap="managerVO">
+	 	select <include refid="columns" />
+	 	from manager_view
+	 	where member_id = #{memberId}
+	 	and member_name=#{memberName}
+	 	and member_phone=#{memberPhone}
+	 	and board_name=#{boardName}
+	 	and board_code=#{boardCode}
+	 </select>
+	 
+	 <select id="searchManagerViews" parameterType="java.util.ArrayList" resultMap="managerVO">
+	 	select <include refid="columns" />
+	 	from manager_view
+	 	where
+	 	<foreach collection="list" item="item" separator="or" index="index" open="(" close=")">
+	 	member_id = #{item.memberId}
+	 	and member_name=#{item.memberName}
+	 	and member_phone=#{item.memberPhone}
+	 	and board_name=#{item.boardName}
+	 	and board_code=#{item.boardCode}
+	 	</foreach>
+	 </select>
+	 
+	 <select id="searchManagerViewAll" resultMap="managerVO">
+	 	select <include refid="columns" />
+	 	from manager_view
+	 </select>
+	 
+	</mapper>

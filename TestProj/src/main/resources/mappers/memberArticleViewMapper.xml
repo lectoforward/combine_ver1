@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+  <mapper namespace="com.lecto.forward.persistence.MemberArticleViewMapper">
+	 <resultMap type="com.lecto.forward.vo.MemberArticleVO" id="memberArticleVO">
+	 	<id property="memberId" column="member_id" jdbcType="VARCHAR" />
+	 	<id property="articleCode" column="article_code" jdbcType="VARCHAR" />
+	 	<id property="boardName" column="board_name" jdbcType="VARCHAR" />
+	 	<id property="articleHits" column="article_hits" jdbcType="INTEGER" />
+	 	<id property="articleContent" column="article_content" jdbcType="VARCHAR" />
+	 	<id property="articleTitle" column="article_title" jdbcType="VARCHAR" />
+	 	<id property="notice" column="notice" jdbcType="BOOLEAN" />
+	 	<id property="articleDate" column="article_date" jdbcType="DATE" />
+	 	<id property="commentCnt" column="mcmt_cnt" jdbcType="INTEGER" />
+	 	<id property="memberNickname" column="member_nickname" jdbcType="VARCHAR" />
+	 </resultMap>
+	 
+	 <sql id="columns">
+	 	member_id, article_code, board_name, article_hits, article_content,
+	 	article_title, notice, article_date, mcmt_cnt, member_nickname
+	 </sql>	
+	 
+	 <select id="searchNicknameArticle" resultMap="memberArticleVO">
+	 	select <include refid="columns" />
+	 	from member_article_view
+	 	where member_nickname = #{memberNickname}
+	 </select>
+	 
+	  <select id="searchNicknameArticles" resultMap="memberArticleVO">
+	 	select <include refid="columns" />
+	 	from member_article_view
+	 	where member_nickname like CONCAT('%',#{memberNickname},'%')
+	 </select>
+	 
+	 <select id="searchMemberIdArticle" resultMap="memberArticleVO">
+	 	select <include refid="columns" />
+	 	from member_article_view
+	 	where member_id = #{memberId}
+	 </select>
+	 
+	  <select id="searchMemberIdArticles" resultMap="memberArticleVO">
+	 	select <include refid="columns" />
+	 	from member_article_view
+	 	where member_id like CONCAT('%',#{memberId},'%')
+	 </select>
+	 
+	 <select id="searchArticleCnt" resultType="java.lang.Integer">
+	 	SELECT COUNT(*)
+	 	AS art_cnt
+	 	from
+	 	(select <include refid="columns" />
+	 	from member_article_view
+	 	where board_name= #{boardName} and member_id = #{memberId})
+	 	as s1
+	 </select>
+	 
+	  <select id="searchMemberArticleView" resultMap="memberArticleVO">
+	 	select <include refid="columns" />
+	 	from member_article_view
+	 	where member_id=#{memberId} 
+	 	and
+	 	member_nickname=#{memberNickname} 
+	 	and
+	 	board_name=#{boardName} 
+	 	and
+	 	article_code=#{articleCode} 
+	 	and 
+	 	notice=#{notice} 
+	 	and 
+	 	article_title=#{articleTitle} 
+	 	and 
+	 	article_content=#{articleContent} 
+	 	and 
+	 	article_date=#{articleDate} 
+	 </select>
+	 
+	 <select id="searchMemberArticleViews" parameterType="java.util.List" resultMap="memberArticleVO">
+	 	select <include refid="columns" />
+	 	from member_article_view
+	 	where
+	 	<foreach collection="list" item="item"  separator="or" index="index" open="(" close=")">
+	 	member_id=#{item.memberId} 
+	 	and
+	 	member_nickname=#{item.memberNickname} 
+	 	and
+	 	board_name=#{item.boardName} 
+	 	and
+	 	article_code=#{item.articleCode} 
+	 	and 
+	 	notice=#{item.notice} 
+	 	and 
+	 	article_title=#{item.articleTitle} 
+	 	and 
+	 	article_content=#{item.articleContent} 
+	 	and 
+	 	article_date=#{item.articleDate} 
+	 	</foreach>
+	 </select>
+	  
+	 </mapper>

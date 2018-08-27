@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+<mapper namespace="com.lecto.forward.persistence.BoardMapper">
+	<resultMap type="com.lecto.forward.dto.BoardDTO" id="board">
+		<id property="boardName" column="board_name" jdbcType="VARCHAR"/>
+		<id property="boardCode" column="board_code" jdbcType="VARCHAR"/>
+		<id property="gradeUpDate" column="gradeup_date" jdbcType="VARCHAR"/>
+		<id property="themeCode" column="theme_code" jdbcType="VARCHAR"/>
+	</resultMap>
+	
+	<sql id ="columns">
+		board_name, board_code, gradeup_date, theme_code
+	</sql>
+	
+	<insert id="addBoardDTO" >
+		insert into board_tb
+		values (#{boardName}, #{boardCode}, #{gradeUpDate}, #{themeCode})
+	</insert>
+	
+	<insert id="addBoards" parameterType="java.util.List">
+		insert into board_tb
+		values
+		<foreach collection="list" item="item" separator=",">
+			(#{item.boardName}, #{item.boardCode}, #{item.gradeUpDate}, #{item.themeCode})
+		</foreach>
+	</insert>
+	
+	<update id="updateGradeUpdate">
+		update board_tb set
+		gradeup_date = #{gradeUpDate}
+		where
+		board_code = #{boardCode} 
+	</update>
+
+	<update id="updateBoardName">
+		update board_tb set board_name= #{boardName} where board_code like #{boardCode}
+	</update>
+
+	<update id="updateThemeCode">
+		update board_tb set
+		theme_code = #{themeCode}
+		where board_code like #{boardCode}		
+	</update>
+	
+	<update id="updateBoard">
+		update board_tb set board_name=#{boardName}, gradeup_date=#{gradeUpDate}
+		where board_code = #{boardCode}
+	</update>
+	
+	<delete id="deleteBoard" >
+		delete from board_tb where board_code=#{boardCode}
+	</delete> 
+	
+	<delete id="deleteBoards" parameterType="java.util.ArrayList">
+		delete from board_tb
+		where
+		<foreach collection="list" item="item" separator="or" index="index" open="(" close=")">
+			 board_code = #{item}
+		</foreach>
+	</delete>
+	
+	<delete id="deleteBoardName" parameterType="java.util.ArrayList">
+		delete from board_tb
+		where
+		<foreach collection="list" item="item" separator="or" index="index" open="(" close=")">
+			 board_name = #{item}
+		</foreach>
+	</delete>
+	
+	<select id="searchBoardAll" resultMap="board">
+		select <include refid="columns"/> from board_tb	
+		order by board_code DESC	
+	</select> 
+	
+	<select id="searchBoardName" resultMap="board">
+		select <include refid="columns"/> from board_tb where board_name = #{boardName}
+	</select>
+	
+	<select id="searchBoardCode" resultMap="board">
+		select <include refid="columns"/> from board_tb where board_code = #{boardCode}
+	</select>
+	
+	<select id="searchThemeCode" resultMap="board">
+		select <include refid="columns"/> from board_tb where theme_code = #{themeCode}
+		order by board_code DESC
+	</select>
+	
+	<select id="searchGradeUpdate" resultMap ="board" >
+		select <include refid="columns"/> from board_tb where gradeUp_date = #{gradeUpDate}
+		order by board_code DESC
+	</select>
+	
+	<select id="searchBoard" resultMap="board">
+		select <include refid="columns"/>
+		from board_tb
+		where board_code = #{boardCode}
+		and board_name = #{boardName}
+		and gradeup_code = #{gradeUpDatae}
+		and theme_code = #{themeCode} 
+	</select>
+	
+	<select id="searchBoards" parameterType="java.util.ArrayList" resultMap ="board">
+		select <include refid="columns"/>
+		from board_tb
+		where
+		<foreach collection="list" item="item" separator="or" index="index" open="(" close=")">
+			board_code = #{item.boardCode}
+		</foreach>
+	</select>
+
+	</mapper>
